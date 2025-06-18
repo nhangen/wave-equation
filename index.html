@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wave Equation Solver - Cyberpunk Edition</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        :root {
+            --cyber-pink: #ff006e;
+            --cyber-blue: #00f5ff;
+            --cyber-yellow: #ffdd00;
+            --cyber-purple: #8338ec;
+            --neon-green: #39ff14;
+            --dark-bg: #0a0a0a;
+            --card-bg: rgba(20, 20, 30, 0.9);
+            --hologram: linear-gradient(45deg, #ff006e, #00f5ff, #ffdd00);
+            --glitch-1: #ff006e;
+            --glitch-2: #00f5ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', monospace;
+            background: var(--dark-bg);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated grid background */
+        .cyber-grid {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -2;
+            background-image: 
+                linear-gradient(rgba(255, 0, 110, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 0, 110, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: grid-move 10s linear infinite;
+        }
+
+        @keyframes grid-move {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Holographic overlay */
+        .holo-overlay {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 0, 110, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 245, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(131, 56, 236, 0.1) 0%, transparent 50%);
+            filter: blur(40px);
+            animation: holo-shift 15s ease-in-out infinite;
+        }
+
+        @keyframes holo-shift {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(180deg); }
+        }
+
+        /* Container */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Glitch header */
+        .header {
+            text-align: center;
+            padding: 3rem 0 4rem;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            position: relative;
+            display: inline-block;
+            background: var(--hologram);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 30px rgba(255, 0, 110, 0.8));
+            animation: glitch 2s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 100% {
+                text-shadow: 
+                    0.05em 0 0 var(--glitch-1),
+                    -0.05em 0 0 var(--glitch-2);
+            }
+            50% {
+                text-shadow: 
+                    -0.05em 0 0 var(--glitch-1),
+                    0.05em 0 0 var(--glitch-2);
+            }
+        }
+
+        h1::before,
+        h1::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--hologram);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h1::before {
+            animation: glitch-1 0.5s infinite;
+            color: var(--glitch-1);
+            z-index: -1;
+        }
+
+        h1::after {
+            animation: glitch-2 0.5s infinite;
+            color: var(--glitch-2);
+            z-index: -2;
+        }
+
+        @keyframes glitch-1 {
+            0%, 100% { clip-path: inset(0 0 0 0); }
+            20% { clip-path: inset(20% 0 60% 0); }
+            40% { clip-path: inset(50% 0 20% 0); }
+            60% { clip-path: inset(10% 0 80% 0); }
+            80% { clip-path: inset(80% 0 5% 0); }
+        }
+
+        @keyframes glitch-2 {
+            0%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+            20% { clip-path: inset(60% 0 20% 0); transform: translate(-2px, 2px); }
+            40% { clip-path: inset(20% 0 50% 0); transform: translate(2px, -2px); }
+            60% { clip-path: inset(80% 0 10% 0); transform: translate(-2px, -2px); }
+            80% { clip-path: inset(5% 0 80% 0); transform: translate(2px, 2px); }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--cyber-blue);
+            margin-top: 1rem;
+            text-shadow: 0 0 20px rgba(0, 245, 255, 0.8);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        /* Layout grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Cyberpunk panels */
+        .cyber-panel {
+            background: var(--card-bg);
+            border: 2px solid var(--cyber-pink);
+            border-radius: 0;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 0 40px rgba(255, 0, 110, 0.3),
+                inset 0 0 60px rgba(255, 0, 110, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .cyber-panel::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: var(--hologram);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            filter: blur(10px);
+        }
+
+        .cyber-panel:hover::before {
+            opacity: 1;
+        }
+
+        .cyber-panel::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--cyber-blue), transparent);
+            animation: scan 3s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .panel-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--cyber-yellow);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            text-shadow: 0 0 20px rgba(255, 221, 0, 0.8);
+        }
+
+        /* Form controls */
+        .control-group {
+            margin-bottom: 1.8rem;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-size: 0.9rem;
+            color: var(--cyber-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--cyber-pink);
+            color: var(--cyber-yellow);
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 20px rgba(255, 0, 110, 0.1);
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--cyber-blue);
+            box-shadow: 
+                0 0 20px rgba(0, 245, 255, 0.5),
+                inset 0 0 20px rgba(0, 245, 255, 0.1);
+            background: rgba(0, 245, 255, 0.05);
+        }
+
+        /* Cyber sliders */
+        .cyber-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, var(--cyber-pink) 0%, var(--cyber-blue) 100%);
+            outline: none;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+            margin: 1rem 0;
+        }
+
+        .cyber-slider:hover {
+            opacity: 1;
+        }
+
+        .cyber-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            background: var(--cyber-yellow);
+            cursor: pointer;
+            border: 3px solid var(--dark-bg);
+            box-shadow: 0 0 20px var(--cyber-yellow);
+            transition: all 0.3s ease;
+        }
+
+        .cyber-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.3);
+            box-shadow: 0 0 30px var(--cyber-yellow);
+        }
+
+        .slider-value {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 221, 0, 0.1);
+            border: 1px solid var(--cyber-yellow);
+            color: var(--cyber-yellow);
+            margin-left: 1rem;
+            font-weight: 700;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        /* Neon button */
+        .neon-button {
+            width: 100%;
+            padding: 1.5rem;
+            background: transparent;
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 0 20px rgba(57, 255, 20, 0.5),
+                inset 0 0 20px rgba(57, 255, 20, 0.1);
+        }
+
+        .neon-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--neon-green);
+            transform: translate(-50%, -50%);
+            transition: all 0.5s ease;
+            border-radius: 50%;
+        }
+
+        .neon-button:hover {
+            color: var(--dark-bg);
+            text-shadow: none;
+            box-shadow: 
+                0 0 40px rgba(57, 255, 20, 0.8),
+                inset 0 0 40px rgba(57, 255, 20, 0.2);
+        }
+
+        .neon-button:hover::before {
+            width: 120%;
+            height: 400%;
+        }
+
+        .neon-button span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Visualization area */
+        .viz-container {
+            height: 600px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--cyber-blue);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 0 40px rgba(0, 245, 255, 0.3),
+                inset 0 0 100px rgba(0, 245, 255, 0.05);
+        }
+
+        .viz-container::before {
+            content: 'WAVE VISUALIZATION';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 0.8rem;
+            color: var(--cyber-blue);
+            opacity: 0.5;
+            letter-spacing: 0.2em;
+        }
+
+        #wave-plot,
+        #frequency-plot,
+        #energy-plot {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Mode selector */
+        .mode-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--cyber-pink);
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 0.8rem;
+            background: transparent;
+            border: 1px solid var(--cyber-pink);
+            color: var(--cyber-pink);
+            font-family: 'Orbitron', monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .mode-btn.active {
+            background: var(--cyber-pink);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px rgba(255, 0, 110, 0.8);
+        }
+
+        /* Stats display */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--cyber-yellow);
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--cyber-yellow), transparent);
+            animation: scan 2s linear infinite;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--cyber-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--cyber-yellow);
+            text-shadow: 0 0 20px rgba(255, 221, 0, 0.8);
+        }
+
+        /* Loading state */
+        .cyber-loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+
+        .cyber-loader-inner {
+            width: 100px;
+            height: 100px;
+            border: 3px solid transparent;
+            border-top-color: var(--cyber-pink);
+            border-bottom-color: var(--cyber-blue);
+            border-radius: 50%;
+            animation: cyber-spin 1s linear infinite;
+            box-shadow: 
+                0 0 40px var(--cyber-pink),
+                inset 0 0 40px var(--cyber-blue);
+        }
+
+        @keyframes cyber-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-grid"></div>
+    <div class="holo-overlay"></div>
+    
+    <div class="container">
+        <header class="header">
+            <h1 data-text="WAVE EQUATION">WAVE EQUATION</h1>
+            <p class="subtitle">∂²u/∂t² = c² ∇²u</p>
+        </header>
+
+        <div class="main-grid">
+            <!-- Control Panel -->
+            <div class="cyber-panel">
+                <h2 class="panel-title">Wave Parameters</h2>
+                
+                <div class="control-group">
+                    <label class="control-label">Wave Type</label>
+                    <select id="wave-type" onchange="updateWaveParameters()">
+                        <option value="string">1D String</option>
+                        <option value="membrane">2D Membrane</option>
+                        <option value="acoustic">3D Acoustic</option>
+                        <option value="electromagnetic">EM Wave</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Boundary Conditions</label>
+                    <select id="boundary-type">
+                        <option value="fixed">Fixed Ends</option>
+                        <option value="free">Free Ends</option>
+                        <option value="periodic">Periodic</option>
+                        <option value="absorbing">Absorbing</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Initial Condition</label>
+                    <select id="initial-condition">
+                        <option value="pluck">Plucked String</option>
+                        <option value="strike">Struck String</option>
+                        <option value="gaussian">Gaussian Pulse</option>
+                        <option value="sinusoidal">Sinusoidal</option>
+                        <option value="square">Square Wave</option>
+                        <option value="custom">Custom Function</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Wave Speed (c)</label>
+                    <input type="range" id="wave-speed" class="cyber-slider" min="0.1" max="5" value="1" step="0.1" oninput="updateSliderValue(this)">
+                    <span class="slider-value" id="wave-speed-value">1.0</span>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Damping Factor (γ)</label>
+                    <input type="range" id="damping" class="cyber-slider" min="0" max="1" value="0" step="0.01" oninput="updateSliderValue(this)">
+                    <span class="slider-value" id="damping-value">0.00</span>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Length (L)</label>
+                    <input type="number" id="length" value="10" step="0.5" min="1">
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Tension (T)</label>
+                    <input type="number" id="tension" value="100" step="10" min="1">
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Density (ρ)</label>
+                    <input type="number" id="density" value="1" step="0.1" min="0.1">
+                </div>
+
+                <div id="wave-specific-params"></div>
+
+                <div class="control-group">
+                    <label class="control-label">Time Evolution</label>
+                    <input type="range" id="time-control" class="cyber-slider" min="0" max="10" value="0" step="0.01" oninput="updateTimeEvolution(this)">
+                    <span class="slider-value" id="time-value">0.00 s</span>
+                </div>
+
+                <button class="neon-button" onclick="solveWaveEquation()">
+                    <span>INITIALIZE WAVE</span>
+                </button>
+
+                <button class="neon-button" onclick="startAnimation()" style="margin-top: 1rem;">
+                    <span id="play-button-text">▶ PLAY</span>
+                </button>
+            </div>
+
+            <!-- Visualization Panel -->
+            <div class="cyber-panel">
+                <h2 class="panel-title">Wave Dynamics</h2>
+                
+                <div class="mode-selector">
+                    <button class="mode-btn active" onclick="switchMode('displacement')">Displacement</button>
+                    <button class="mode-btn" onclick="switchMode('velocity')">Velocity</button>
+                    <button class="mode-btn" onclick="switchMode('energy')">Energy</button>
+                    <button class="mode-btn" onclick="switchMode('frequency')">Frequency</button>
+                </div>
+                
+                <div class="viz-container">
+                    <div id="wave-plot"></div>
+                    <div id="frequency-plot" style="display: none;"></div>
+                    <div id="energy-plot" style="display: none;"></div>
+                    <div class="cyber-loader" id="loader">
+                        <div class="cyber-loader-inner"></div>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Energy</div>
+                        <div class="stat-value" id="total-energy">0.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Max Amplitude</div>
+                        <div class="stat-value" id="max-amplitude">0.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Frequency</div>
+                        <div class="stat-value" id="fundamental-freq">0.0 Hz</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Wavelength</div>
+                        <div class="stat-value" id="wavelength">0.0 m</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Phase Velocity</div>
+                        <div class="stat-value" id="phase-velocity">0.0 m/s</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Kinetic/Total</div>
+                        <div class="stat-value" id="energy-ratio">0.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.0/plotly.min.js"></script>
+    <script>
+        // Global variables
+        let waveData = {
+            x: [],
+            u: [],
+            v: [],
+            previousU: []
+        };
+        let parameters = {};
+        let animationId = null;
+        let currentTime = 0;
+        let currentMode = 'displacement';
+        let isPlaying = false;
+
+        // Update slider value display
+        function updateSliderValue(slider) {
+            const valueSpan = document.getElementById(slider.id + '-value');
+            if (slider.id === 'time-control') {
+                valueSpan.textContent = parseFloat(slider.value).toFixed(2) + ' s';
+            } else {
+                valueSpan.textContent = parseFloat(slider.value).toFixed(2);
+            }
+        }
+
+        // Update wave-specific parameters
+        function updateWaveParameters() {
+            const waveType = document.getElementById('wave-type').value;
+            const paramsDiv = document.getElementById('wave-specific-params');
+            
+            let html = '';
+            switch(waveType) {
+                case 'membrane':
+                    html = `
+                        <div class="control-group">
+                            <label class="control-label">Width (W)</label>
+                            <input type="number" id="width" value="10" step="0.5" min="1">
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Mode (n,m)</label>
+                            <input type="number" id="mode-n" value="1" step="1" min="1" max="5" style="width: 48%; display: inline-block;">
+                            <input type="number" id="mode-m" value="1" step="1" min="1" max="5" style="width: 48%; display: inline-block; margin-left: 4%;">
+                        </div>
+                    `;
+                    break;
+                case 'electromagnetic':
+                    html = `
+                        <div class="control-group">
+                            <label class="control-label">Permittivity (ε)</label>
+                            <input type="number" id="permittivity" value="8.854e-12" step="1e-13">
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Permeability (μ)</label>
+                            <input type="number" id="permeability" value="1.257e-6" step="1e-7">
+                        </div>
+                    `;
+                    break;
+                case 'acoustic':
+                    html = `
+                        <div class="control-group">
+                            <label class="control-label">Temperature (°C)</label>
+                            <input type="number" id="temperature" value="20" step="1">
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Medium</label>
+                            <select id="medium">
+                                <option value="air">Air</option>
+                                <option value="water">Water</option>
+                                <option value="steel">Steel</option>
+                            </select>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            paramsDiv.innerHTML = html;
+        }
+
+        // Initialize wave based on conditions
+        function initializeWave() {
+            const length = parseFloat(document.getElementById('length').value);
+            const initialCondition = document.getElementById('initial-condition').value;
+            const N = 200; // Number of spatial points
+            
+            waveData.x = [];
+            waveData.u = [];
+            waveData.v = [];
+            waveData.previousU = [];
+            
+            for (let i = 0; i < N; i++) {
+                const x = (i / (N - 1)) * length;
+                waveData.x.push(x);
+                
+                let u0 = 0;
+                let v0 = 0;
+                
+                switch(initialCondition) {
+                    case 'pluck':
+                        // Triangular initial displacement
+                        const pluckPoint = length * 0.3;
+                        if (x < pluckPoint) {
+                            u0 = 0.1 * x / pluckPoint;
+                        } else {
+                            u0 = 0.1 * (length - x) / (length - pluckPoint);
+                        }
+                        break;
+                        
+                    case 'strike':
+                        // Gaussian initial velocity
+                        const strikePoint = length / 2;
+                        const width = length / 10;
+                        v0 = 0.5 * Math.exp(-Math.pow(x - strikePoint, 2) / (2 * width * width));
+                        break;
+                        
+                    case 'gaussian':
+                        // Gaussian pulse
+                        const center = length / 2;
+                        const sigma = length / 8;
+                        u0 = 0.1 * Math.exp(-Math.pow(x - center, 2) / (2 * sigma * sigma));
+                        break;
+                        
+                    case 'sinusoidal':
+                        // Standing wave
+                        u0 = 0.1 * Math.sin(2 * Math.PI * x / length);
+                        break;
+                        
+                    case 'square':
+                        // Square wave
+                        if (x > length * 0.4 && x < length * 0.6) {
+                            u0 = 0.1;
+                        }
+                        break;
+                }
+                
+                waveData.u.push(u0);
+                waveData.v.push(v0);
+                waveData.previousU.push(u0);
+            }
+        }
+
+        // Solve wave equation using finite differences
+        function evolveWave(dt) {
+            const c = parseFloat(document.getElementById('wave-speed').value);
+            const damping = parseFloat(document.getElementById('damping').value);
+            const boundaryType = document.getElementById('boundary-type').value;
+            const N = waveData.x.length;
+            const dx = waveData.x[1] - waveData.x[0];
+            const r = (c * dt / dx) * (c * dt / dx);
+            
+            // Store current values
+            const newU = [];
+            
+            for (let i = 0; i < N; i++) {
+                if (i === 0 || i === N - 1) {
+                    // Boundary conditions
+                    switch(boundaryType) {
+                        case 'fixed':
+                            newU.push(0);
+                            break;
+                        case 'free':
+                            if (i === 0) {
+                                newU.push(waveData.u[1]);
+                            } else {
+                                newU.push(waveData.u[N - 2]);
+                            }
+                            break;
+                        case 'periodic':
+                            if (i === 0) {
+                                newU.push(waveData.u[N - 2]);
+                            } else {
+                                newU.push(waveData.u[1]);
+                            }
+                            break;
+                        case 'absorbing':
+                            // Mur boundary condition
+                            if (i === 0) {
+                                newU.push(waveData.previousU[1] + (c * dt - dx) / (c * dt + dx) * (waveData.u[1] - waveData.previousU[0]));
+                            } else {
+                                newU.push(waveData.previousU[N - 2] + (c * dt - dx) / (c * dt + dx) * (waveData.u[N - 2] - waveData.previousU[N - 1]));
+                            }
+                            break;
+                    }
+                } else {
+                    // Wave equation with damping
+                    const d2u = waveData.u[i + 1] - 2 * waveData.u[i] + waveData.u[i - 1];
+                    const newVal = 2 * waveData.u[i] - waveData.previousU[i] + r * d2u - 2 * damping * dt * (waveData.u[i] - waveData.previousU[i]);
+                    newU.push(newVal);
+                }
+            }
+            
+            // Update velocities
+            for (let i = 0; i < N; i++) {
+                waveData.v[i] = (newU[i] - waveData.previousU[i]) / (2 * dt);
+            }
+            
+            // Update arrays
+            waveData.previousU = [...waveData.u];
+            waveData.u = newU;
+        }
+
+        // Calculate wave properties
+        function calculateWaveProperties() {
+            const N = waveData.x.length;
+            const dx = waveData.x[1] - waveData.x[0];
+            const c = parseFloat(document.getElementById('wave-speed').value);
+            const tension = parseFloat(document.getElementById('tension').value);
+            const density = parseFloat(document.getElementById('density').value);
+            
+            // Calculate energies
+            let kineticEnergy = 0;
+            let potentialEnergy = 0;
+            let maxAmplitude = 0;
+            
+            for (let i = 0; i < N; i++) {
+                // Kinetic energy: 0.5 * ρ * v²
+                kineticEnergy += 0.5 * density * waveData.v[i] * waveData.v[i] * dx;
+                
+                // Potential energy: 0.5 * T * (∂u/∂x)²
+                if (i < N - 1) {
+                    const dudx = (waveData.u[i + 1] - waveData.u[i]) / dx;
+                    potentialEnergy += 0.5 * tension * dudx * dudx * dx;
+                }
+                
+                // Max amplitude
+                maxAmplitude = Math.max(maxAmplitude, Math.abs(waveData.u[i]));
+            }
+            
+            const totalEnergy = kineticEnergy + potentialEnergy;
+            
+            // Fundamental frequency (for fixed ends)
+            const length = parseFloat(document.getElementById('length').value);
+            const fundamentalFreq = c / (2 * length);
+            
+            // Wavelength of fundamental
+            const wavelength = 2 * length;
+            
+            // Update display
+            document.getElementById('total-energy').textContent = totalEnergy.toFixed(2);
+            document.getElementById('max-amplitude').textContent = maxAmplitude.toFixed(3);
+            document.getElementById('fundamental-freq').textContent = fundamentalFreq.toFixed(1) + ' Hz';
+            document.getElementById('wavelength').textContent = wavelength.toFixed(1) + ' m';
+            document.getElementById('phase-velocity').textContent = c.toFixed(1) + ' m/s';
+            document.getElementById('energy-ratio').textContent = (kineticEnergy / totalEnergy).toFixed(2);
+        }
+
+        // Main solver function
+        function solveWaveEquation() {
+            // Show loader
+            document.getElementById('loader').style.display = 'block';
+            
+            // Initialize wave
+            initializeWave();
+            currentTime = 0;
+            
+            // Reset time slider
+            document.getElementById('time-control').value = 0;
+            document.getElementById('time-value').textContent = '0.00 s';
+            
+            setTimeout(() => {
+                visualizeWave();
+                calculateWaveProperties();
+                document.getElementById('loader').style.display = 'none';
+            }, 300);
+        }
+
+        // Visualization function
+        function visualizeWave() {
+            let data = [];
+            let layout = {};
+            
+            switch(currentMode) {
+                case 'displacement':
+                    data = [{
+                        x: waveData.x,
+                        y: waveData.u,
+                        type: 'scatter',
+                        mode: 'lines',
+                        line: {
+                            color: '#00f5ff',
+                            width: 3
+                        },
+                        fill: 'tozeroy',
+                        fillcolor: 'rgba(0, 245, 255, 0.1)'
+                    }];
+                    
+                    layout = {
+                        title: {
+                            text: 'Wave Displacement',
+                            font: { color: '#00f5ff', size: 20, family: 'Orbitron' }
+                        },
+                        xaxis: {
+                            title: 'Position (m)',
+                            color: '#00f5ff',
+                            gridcolor: 'rgba(0, 245, 255, 0.1)',
+                            zerolinecolor: 'rgba(0, 245, 255, 0.3)'
+                        },
+                        yaxis: {
+                            title: 'Displacement (m)',
+                            color: '#00f5ff',
+                            gridcolor: 'rgba(0, 245, 255, 0.1)',
+                            zerolinecolor: 'rgba(0, 245, 255, 0.3)',
+                            range: [-0.15, 0.15]
+                        }
+                    };
+                    break;
+                    
+                case 'velocity':
+                    data = [{
+                        x: waveData.x,
+                        y: waveData.v,
+                        type: 'scatter',
+                        mode: 'lines',
+                        line: {
+                            color: '#ff006e',
+                            width: 3
+                        },
+                        fill: 'tozeroy',
+                        fillcolor: 'rgba(255, 0, 110, 0.1)'
+                    }];
+                    
+                    layout = {
+                        title: {
+                            text: 'Wave Velocity',
+                            font: { color: '#ff006e', size: 20, family: 'Orbitron' }
+                        },
+                        xaxis: {
+                            title: 'Position (m)',
+                            color: '#ff006e',
+                            gridcolor: 'rgba(255, 0, 110, 0.1)',
+                            zerolinecolor: 'rgba(255, 0, 110, 0.3)'
+                        },
+                        yaxis: {
+                            title: 'Velocity (m/s)',
+                            color: '#ff006e',
+                            gridcolor: 'rgba(255, 0, 110, 0.1)',
+                            zerolinecolor: 'rgba(255, 0, 110, 0.3)'
+                        }
+                    };
+                    break;
+                    
+                case 'energy':
+                    const kineticDensity = waveData.v.map(v => 0.5 * v * v);
+                    const potentialDensity = [];
+                    const dx = waveData.x[1] - waveData.x[0];
+                    
+                    for (let i = 0; i < waveData.x.length - 1; i++) {
+                        const dudx = (waveData.u[i + 1] - waveData.u[i]) / dx;
+                        potentialDensity.push(0.5 * dudx * dudx);
+                    }
+                    potentialDensity.push(0);
+                    
+                    data = [
+                        {
+                            x: waveData.x,
+                            y: kineticDensity,
+                            type: 'scatter',
+                            mode: 'lines',
+                            name: 'Kinetic',
+                            line: { color: '#ffdd00', width: 2 }
+                        },
+                        {
+                            x: waveData.x,
+                            y: potentialDensity,
+                            type: 'scatter',
+                            mode: 'lines',
+                            name: 'Potential',
+                            line: { color: '#8338ec', width: 2 }
+                        }
+                    ];
+                    
+                    layout = {
+                        title: {
+                            text: 'Energy Density',
+                            font: { color: '#ffdd00', size: 20, family: 'Orbitron' }
+                        },
+                        xaxis: {
+                            title: 'Position (m)',
+                            color: '#ffdd00',
+                            gridcolor: 'rgba(255, 221, 0, 0.1)',
+                            zerolinecolor: 'rgba(255, 221, 0, 0.3)'
+                        },
+                        yaxis: {
+                            title: 'Energy Density',
+                            color: '#ffdd00',
+                            gridcolor: 'rgba(255, 221, 0, 0.1)',
+                            zerolinecolor: 'rgba(255, 221, 0, 0.3)'
+                        },
+                        showlegend: true,
+                        legend: {
+                            font: { color: '#ffffff', family: 'Orbitron' },
+                            bgcolor: 'rgba(0, 0, 0, 0.5)',
+                            bordercolor: '#ffdd00',
+                            borderwidth: 1
+                        }
+                    };
+                    break;
+                    
+                case 'frequency':
+                    // Perform FFT
+                    const fftData = performFFT(waveData.u);
+                    const frequencies = fftData.frequencies;
+                    const magnitudes = fftData.magnitudes;
+                    
+                    data = [{
+                        x: frequencies.slice(0, frequencies.length / 2),
+                        y: magnitudes.slice(0, magnitudes.length / 2),
+                        type: 'bar',
+                        marker: {
+                            color: magnitudes.slice(0, magnitudes.length / 2),
+                            colorscale: [
+                                [0, '#00f5ff'],
+                                [0.5, '#ff006e'],
+                                [1, '#ffdd00']
+                            ],
+                            line: {
+                                color: '#ffffff',
+                                width: 1
+                            }
+                        }
+                    }];
+                    
+                    layout = {
+                        title: {
+                            text: 'Frequency Spectrum',
+                            font: { color: '#39ff14', size: 20, family: 'Orbitron' }
+                        },
+                        xaxis: {
+                            title: 'Frequency (Hz)',
+                            color: '#39ff14',
+                            gridcolor: 'rgba(57, 255, 20, 0.1)',
+                            zerolinecolor: 'rgba(57, 255, 20, 0.3)',
+                            range: [0, 50]
+                        },
+                        yaxis: {
+                            title: 'Magnitude',
+                            color: '#39ff14',
+                            gridcolor: 'rgba(57, 255, 20, 0.1)',
+                            zerolinecolor: 'rgba(57, 255, 20, 0.3)'
+                        }
+                    };
+                    break;
+            }
+            
+            // Common layout settings
+            layout.paper_bgcolor = 'rgba(0, 0, 0, 0)';
+            layout.plot_bgcolor = 'rgba(0, 0, 0, 0.2)';
+            layout.font = { family: 'Orbitron', color: '#ffffff' };
+            layout.margin = { t: 50, r: 30, b: 50, l: 60 };
+            
+            const config = {
+                responsive: true,
+                displayModeBar: false
+            };
+            
+            Plotly.newPlot('wave-plot', data, layout, config);
+        }
+
+        // Simple FFT implementation
+        function performFFT(signal) {
+            const N = signal.length;
+            const frequencies = [];
+            const magnitudes = [];
+            
+            for (let k = 0; k < N; k++) {
+                let real = 0;
+                let imag = 0;
+                
+                for (let n = 0; n < N; n++) {
+                    const angle = -2 * Math.PI * k * n / N;
+                    real += signal[n] * Math.cos(angle);
+                    imag += signal[n] * Math.sin(angle);
+                }
+                
+                const magnitude = Math.sqrt(real * real + imag * imag) / N;
+                const length = parseFloat(document.getElementById('length').value);
+                const frequency = k / length;
+                
+                frequencies.push(frequency);
+                magnitudes.push(magnitude);
+            }
+            
+            return { frequencies, magnitudes };
+        }
+
+        // Animation control
+        function startAnimation() {
+            if (isPlaying) {
+                pauseAnimation();
+            } else {
+                isPlaying = true;
+                document.getElementById('play-button-text').textContent = '❚❚ PAUSE';
+                animate();
+            }
+        }
+
+        function pauseAnimation() {
+            isPlaying = false;
+            document.getElementById('play-button-text').textContent = '▶ PLAY';
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+        }
+
+        function animate() {
+            if (!isPlaying) return;
+            
+            const dt = 0.01;
+            evolveWave(dt);
+            currentTime += dt;
+            
+            // Update time slider
+            document.getElementById('time-control').value = currentTime;
+            document.getElementById('time-value').textContent = currentTime.toFixed(2) + ' s';
+            
+            // Update visualization
+            visualizeWave();
+            calculateWaveProperties();
+            
+            // Continue animation
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Time evolution control
+        function updateTimeEvolution(slider) {
+            const targetTime = parseFloat(slider.value);
+            const dt = 0.01;
+            
+            // Reset and evolve to target time
+            initializeWave();
+            currentTime = 0;
+            
+            const steps = Math.floor(targetTime / dt);
+            for (let i = 0; i < steps; i++) {
+                evolveWave(dt);
+            }
+            
+            currentTime = targetTime;
+            visualizeWave();
+            calculateWaveProperties();
+        }
+
+        // Mode switching
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // Update button styles
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update visualization
+            if (waveData.x.length > 0) {
+                visualizeWave();
+            }
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            updateWaveParameters();
+        };
+    </script>
+</body>
+</html>

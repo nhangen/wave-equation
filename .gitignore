@@ -1,0 +1,35 @@
+# .gitignore
+
+# macOS system files
+.DS_Store
+
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Build output
+dist/
+build/
+
+# Environment variables
+.env
+.env.*
+
+# VS Code settings
+.vscode/
+*.code-workspace
+
+# Coverage reports
+coverage/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# OS generated files
+Thumbs.db
