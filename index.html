@@ -43,16 +43,28 @@
             top: 0;
             left: 0;
             z-index: -2;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(255, 0, 110, 0.1) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 0, 110, 0.1) 1px, transparent 1px);
             background-size: 50px 50px;
+            -webkit-animation: grid-move 10s linear infinite;
             animation: grid-move 10s linear infinite;
         }
 
+        @-webkit-keyframes grid-move {
+            0% { -webkit-transform: translate(0, 0); }
+            100% { -webkit-transform: translate(50px, 50px); }
+        }
+
         @keyframes grid-move {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
+            0% {
+                transform: translate(0, 0);
+                -webkit-transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(50px, 50px);
+                -webkit-transform: translate(50px, 50px);
+            }
         }
 
         /* Holographic overlay */
@@ -63,17 +75,30 @@
             top: 0;
             left: 0;
             z-index: -1;
-            background: 
+            background:
                 radial-gradient(circle at 20% 50%, rgba(255, 0, 110, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 80% 80%, rgba(0, 245, 255, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 40% 20%, rgba(131, 56, 236, 0.1) 0%, transparent 50%);
             filter: blur(40px);
+            -webkit-filter: blur(40px);
+            -webkit-animation: holo-shift 15s ease-in-out infinite;
             animation: holo-shift 15s ease-in-out infinite;
         }
 
+        @-webkit-keyframes holo-shift {
+            0%, 100% { -webkit-transform: scale(1) rotate(0deg); }
+            50% { -webkit-transform: scale(1.2) rotate(180deg); }
+        }
+
         @keyframes holo-shift {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.2) rotate(180deg); }
+            0%, 100% {
+                transform: scale(1) rotate(0deg);
+                -webkit-transform: scale(1) rotate(0deg);
+            }
+            50% {
+                transform: scale(1.2) rotate(180deg);
+                -webkit-transform: scale(1.2) rotate(180deg);
+            }
         }
 
         /* Container */
@@ -104,6 +129,8 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             filter: drop-shadow(0 0 30px rgba(255, 0, 110, 0.8));
+            -webkit-filter: drop-shadow(0 0 30px rgba(255, 0, 110, 0.8));
+            -webkit-animation: glitch 2s infinite;
             animation: glitch 2s infinite;
         }
 
@@ -135,14 +162,14 @@
         }
 
         h1::before {
+            -webkit-animation: glitch-1 0.5s infinite;
             animation: glitch-1 0.5s infinite;
-            color: var(--glitch-1);
             z-index: -1;
         }
 
         h1::after {
+            -webkit-animation: glitch-2 0.5s infinite;
             animation: glitch-2 0.5s infinite;
-            color: var(--glitch-2);
             z-index: -2;
         }
 
@@ -155,11 +182,31 @@
         }
 
         @keyframes glitch-2 {
-            0%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
-            20% { clip-path: inset(60% 0 20% 0); transform: translate(-2px, 2px); }
-            40% { clip-path: inset(20% 0 50% 0); transform: translate(2px, -2px); }
-            60% { clip-path: inset(80% 0 10% 0); transform: translate(-2px, -2px); }
-            80% { clip-path: inset(5% 0 80% 0); transform: translate(2px, 2px); }
+            0%, 100% {
+                clip-path: inset(0 0 0 0);
+                transform: translate(0);
+                -webkit-transform: translate(0);
+            }
+            20% {
+                clip-path: inset(60% 0 20% 0);
+                transform: translate(-2px, 2px);
+                -webkit-transform: translate(-2px, 2px);
+            }
+            40% {
+                clip-path: inset(20% 0 50% 0);
+                transform: translate(2px, -2px);
+                -webkit-transform: translate(2px, -2px);
+            }
+            60% {
+                clip-path: inset(80% 0 10% 0);
+                transform: translate(-2px, -2px);
+                -webkit-transform: translate(-2px, -2px);
+            }
+            80% {
+                clip-path: inset(5% 0 80% 0);
+                transform: translate(2px, 2px);
+                -webkit-transform: translate(2px, 2px);
+            }
         }
 
         .subtitle {
@@ -167,6 +214,7 @@
             color: var(--cyber-blue);
             margin-top: 1rem;
             text-shadow: 0 0 20px rgba(0, 245, 255, 0.8);
+            -webkit-animation: pulse-glow 2s ease-in-out infinite;
             animation: pulse-glow 2s ease-in-out infinite;
         }
 
@@ -223,6 +271,7 @@
             width: 100%;
             height: 2px;
             background: linear-gradient(90deg, transparent, var(--cyber-blue), transparent);
+            -webkit-animation: scan 3s linear infinite;
             animation: scan 3s linear infinite;
         }
 
@@ -306,9 +355,27 @@
             border: 3px solid var(--dark-bg);
             box-shadow: 0 0 20px var(--cyber-yellow);
             transition: all 0.3s ease;
+            transform-origin: center center;
         }
 
         .cyber-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.3);
+            box-shadow: 0 0 30px var(--cyber-yellow);
+        }
+
+        .cyber-slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            background: var(--cyber-yellow);
+            cursor: pointer;
+            border: 3px solid var(--dark-bg);
+            box-shadow: 0 0 20px var(--cyber-yellow);
+            transition: all 0.3s ease;
+            transform-origin: center center;
+            border-radius: 0;
+        }
+
+        .cyber-slider::-moz-range-thumb:hover {
             transform: scale(1.3);
             box-shadow: 0 0 30px var(--cyber-yellow);
         }
@@ -355,14 +422,17 @@
             height: 0;
             background: var(--neon-green);
             transform: translate(-50%, -50%);
+            -webkit-transform: translate(-50%, -50%);
             transition: all 0.5s ease;
+            -webkit-transition: all 0.5s ease;
             border-radius: 50%;
+            z-index: 0;
         }
 
         .neon-button:hover {
             color: var(--dark-bg);
             text-shadow: none;
-            box-shadow: 
+            box-shadow:
                 0 0 40px rgba(57, 255, 20, 0.8),
                 inset 0 0 40px rgba(57, 255, 20, 0.2);
         }
@@ -370,6 +440,13 @@
         .neon-button:hover::before {
             width: 120%;
             height: 400%;
+        }
+
+        .neon-button:active::before {
+            width: 140%;
+            height: 500%;
+            transition: all 0.2s ease;
+            -webkit-transition: all 0.2s ease;
         }
 
         .neon-button span {
@@ -461,7 +538,8 @@
             width: 100%;
             height: 2px;
             background: linear-gradient(90deg, transparent, var(--cyber-yellow), transparent);
-            animation: scan 2s linear infinite;
+            -webkit-animation: scan 3s linear infinite;
+            animation: scan 3s linear infinite;
         }
 
         .stat-label {
@@ -495,15 +573,27 @@
             border-top-color: var(--cyber-pink);
             border-bottom-color: var(--cyber-blue);
             border-radius: 50%;
+            -webkit-animation: cyber-spin 1s linear infinite;
             animation: cyber-spin 1s linear infinite;
-            box-shadow: 
+            box-shadow:
                 0 0 40px var(--cyber-pink),
                 inset 0 0 40px var(--cyber-blue);
         }
 
+        @-webkit-keyframes cyber-spin {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+        }
+
         @keyframes cyber-spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+                -webkit-transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+                -webkit-transform: rotate(360deg);
+            }
         }
 
         /* Responsive */
@@ -614,10 +704,10 @@
                 <h2 class="panel-title">Wave Dynamics</h2>
                 
                 <div class="mode-selector">
-                    <button class="mode-btn active" onclick="switchMode('displacement')">Displacement</button>
-                    <button class="mode-btn" onclick="switchMode('velocity')">Velocity</button>
-                    <button class="mode-btn" onclick="switchMode('energy')">Energy</button>
-                    <button class="mode-btn" onclick="switchMode('frequency')">Frequency</button>
+                    <button class="mode-btn active" onclick="switchMode('displacement', this)">Displacement</button>
+                    <button class="mode-btn" onclick="switchMode('velocity', this)">Velocity</button>
+                    <button class="mode-btn" onclick="switchMode('energy', this)">Energy</button>
+                    <button class="mode-btn" onclick="switchMode('frequency', this)">Frequency</button>
                 </div>
                 
                 <div class="viz-container">
@@ -906,29 +996,46 @@
 
         // Main solver function
         function solveWaveEquation() {
+            // Pause animation if running
+            const wasPlaying = isPlaying;
+            if (isPlaying) {
+                pauseAnimation();
+            }
+
             // Show loader
             document.getElementById('loader').style.display = 'block';
-            
+
             // Initialize wave
             initializeWave();
             currentTime = 0;
-            
+
             // Reset time slider
             document.getElementById('time-control').value = 0;
             document.getElementById('time-value').textContent = '0.00 s';
-            
+
             setTimeout(() => {
                 visualizeWave();
                 calculateWaveProperties();
                 document.getElementById('loader').style.display = 'none';
+
+                // Restart animation if it was playing
+                if (wasPlaying) {
+                    startAnimation();
+                }
             }, 300);
         }
 
         // Visualization function
         function visualizeWave() {
+            // Check if Plotly is loaded
+            if (typeof Plotly === 'undefined') {
+                console.error('Plotly.js is not loaded');
+                return;
+            }
+
             let data = [];
             let layout = {};
-            
+
             switch(currentMode) {
                 case 'displacement':
                     data = [{
@@ -1112,8 +1219,16 @@
                 responsive: true,
                 displayModeBar: false
             };
-            
-            Plotly.newPlot('wave-plot', data, layout, config);
+
+            // Use react instead of newPlot for better performance during animation
+            const plotDiv = document.getElementById('wave-plot');
+            if (plotDiv && plotDiv.data) {
+                // Plot already exists, use react for faster updates
+                Plotly.react('wave-plot', data, layout, config);
+            } else {
+                // Initial plot creation
+                Plotly.newPlot('wave-plot', data, layout, config);
+            }
         }
 
         // Simple FFT implementation
@@ -1148,6 +1263,10 @@
             if (isPlaying) {
                 pauseAnimation();
             } else {
+                // Ensure any previous animation is stopped
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
                 isPlaying = true;
                 document.getElementById('play-button-text').textContent = '❚❚ PAUSE';
                 animate();
@@ -1159,55 +1278,113 @@
             document.getElementById('play-button-text').textContent = '▶ PLAY';
             if (animationId) {
                 cancelAnimationFrame(animationId);
+                animationId = null;
             }
         }
 
         function animate() {
-            if (!isPlaying) return;
-            
+            if (!isPlaying) {
+                animationId = null;
+                return;
+            }
+
             const dt = 0.01;
-            evolveWave(dt);
-            currentTime += dt;
-            
-            // Update time slider
-            document.getElementById('time-control').value = currentTime;
-            document.getElementById('time-value').textContent = currentTime.toFixed(2) + ' s';
-            
-            // Update visualization
-            visualizeWave();
-            calculateWaveProperties();
-            
-            // Continue animation
-            animationId = requestAnimationFrame(animate);
+
+            // Check if wave data is initialized
+            if (!waveData.x || waveData.x.length === 0) {
+                console.warn('Wave data not initialized. Stopping animation.');
+                pauseAnimation();
+                return;
+            }
+
+            try {
+                evolveWave(dt);
+                currentTime += dt;
+
+                // Update time slider
+                const timeControl = document.getElementById('time-control');
+                const timeValue = document.getElementById('time-value');
+
+                if (timeControl && timeValue) {
+                    // Reset time if it exceeds slider max
+                    const maxTime = parseFloat(timeControl.max);
+                    if (currentTime > maxTime) {
+                        currentTime = 0;
+                        initializeWave();
+                    }
+
+                    timeControl.value = currentTime;
+                    timeValue.textContent = currentTime.toFixed(2) + ' s';
+                }
+
+                // Update visualization
+                visualizeWave();
+                calculateWaveProperties();
+
+                // Continue animation
+                animationId = requestAnimationFrame(animate);
+            } catch (error) {
+                console.error('Animation error:', error);
+                pauseAnimation();
+            }
         }
 
         // Time evolution control
         function updateTimeEvolution(slider) {
+            // Pause animation if playing
+            const wasPlaying = isPlaying;
+            if (isPlaying) {
+                pauseAnimation();
+            }
+
             const targetTime = parseFloat(slider.value);
             const dt = 0.01;
-            
-            // Reset and evolve to target time
-            initializeWave();
-            currentTime = 0;
-            
-            const steps = Math.floor(targetTime / dt);
-            for (let i = 0; i < steps; i++) {
-                evolveWave(dt);
+
+            // Only recalculate if user dragged to a different time
+            if (Math.abs(targetTime - currentTime) > dt) {
+                // Reset and evolve to target time
+                initializeWave();
+                currentTime = 0;
+
+                const steps = Math.floor(targetTime / dt);
+                for (let i = 0; i < steps; i++) {
+                    evolveWave(dt);
+                }
+
+                currentTime = targetTime;
             }
-            
-            currentTime = targetTime;
+
+            // Update display
+            updateSliderValue(slider);
             visualizeWave();
             calculateWaveProperties();
+
+            // Resume animation if it was playing
+            if (wasPlaying) {
+                startAnimation();
+            }
         }
 
         // Mode switching
-        function switchMode(mode) {
+        function switchMode(mode, clickedElement) {
             currentMode = mode;
-            
+
             // Update button styles
             document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
+
+            // If called from event handler, use the element reference
+            if (clickedElement) {
+                clickedElement.classList.add('active');
+            } else {
+                // Fallback: find and activate the correct button based on mode
+                const buttons = document.querySelectorAll('.mode-btn');
+                const modeMap = ['displacement', 'velocity', 'energy', 'frequency'];
+                const index = modeMap.indexOf(mode);
+                if (index >= 0 && buttons[index]) {
+                    buttons[index].classList.add('active');
+                }
+            }
+
             // Update visualization
             if (waveData.x.length > 0) {
                 visualizeWave();
