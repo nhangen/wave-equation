@@ -150,7 +150,18 @@ function setupTestEnvironment() {
         setState: sandbox.__setInternal,
         getPlotlyCalls: () => plotlyCalls,
         setPlotlyRejectNext: (v) => { plotlyRejectNext = v; },
-        cancelledRafIds
+        cancelledRafIds,
+        // Fire the frame animate() queued. Without this the loop body runs
+        // exactly once per startAnimation(), so every fix inside animate() --
+        // the max-time reset, the catch that pauses -- could be deleted with
+        // the suite still green.
+        pumpFrame() {
+            const [id, cb] = [...rafCallbacks.entries()].pop() ?? [];
+            if (cb === undefined) return false;
+            rafCallbacks.delete(id);
+            cb();
+            return true;
+        }
     };
 }
 
@@ -301,4 +312,65 @@ test('HTML verification: dead plot divs removed and data-mode added', () => {
     assert.ok(!htmlContent.includes('id="energy-plot"'), 'energy-plot should be removed');
     assert.ok(htmlContent.includes('data-mode="displacement"'), 'data-mode="displacement" should exist');
     assert.ok(htmlContent.includes('onclick="toggleAnimation()"'), 'toggleAnimation onclick should exist');
+});
+
+test('animate resets the loop when currentTime passes the slider max', () => {
+    const { sandbox, elements, setState, getState, pumpFrame } = setupTestEnvironment();
+
+    sandbox.initializeWave();
+    elements.get('time-control').max = '10';
+    setState({ currentTime: 9.999, isPlaying: false });
+
+    sandbox.startAnimation();
+    assert.equal(pumpFrame(), true, 'startAnimation must queue a frame to pump');
+
+    // Enough frames to carry currentTime past max=10 and wrap it.
+    for (let i = 0; i < 40 && getState().currentTime > 1; i++) pumpFrame();
+
+    assert.ok(getState().currentTime < 1,
+        `currentTime should wrap to ~0 past the max, got ${getState().currentTime}`);
+    assert.equal(getState().waveData.x.length > 0, true, 'the wave should be re-initialized on wrap');
+});
+
+test('animate pauses playback when the loop body throws', () => {
+    const { sandbox, setState, getState, pumpFrame, elements } = setupTestEnvironment();
+
+    sandbox.initializeWave();
+    sandbox.startAnimation();
+    assert.equal(getState().isPlaying, true);
+
+    // Remove a stat element calculateWaveProperties writes to unguarded, so the
+    // next frame throws inside the try.
+    elements.delete('total-energy');
+    pumpFrame();
+
+    assert.equal(getState().isPlaying, false, 'a throw inside animate must pause playback');
+    assert.equal(elements.get('play-button-text').textContent, '▶ PLAY');
+});
+
+test('switchMode moves the active class using the element the caller passes', () => {
+    const { sandbox, elements } = setupTestEnvironment();
+    const disp = elements.get('btn-disp');
+    const energy = elements.get('btn-energy');
+
+    sandbox.initializeWave();
+
+    // Production always passes the clicked element (index.html:695-698); every
+    // other test in this file passes one argument and so exercises only the
+    // querySelector fallback.
+    sandbox.switchMode('displacement', disp);
+    assert.equal(disp.classList.contains('active'), true);
+
+    sandbox.switchMode('energy', energy);
+    assert.equal(energy.classList.contains('active'), true, 'the clicked element must gain active');
+    assert.equal(disp.classList.contains('active'), false, 'the previous button must lose active');
+
+    // The passed element wins over the data-mode lookup. Without this the two
+    // branches are indistinguishable, since the button the caller clicks is
+    // normally the one the selector would find anyway -- which is why dropping
+    // the parameter entirely used to leave the suite green.
+    sandbox.switchMode('velocity', disp);
+    assert.equal(disp.classList.contains('active'), true,
+        'switchMode must use the element it was passed, not the data-mode lookup');
+    assert.equal(elements.get('btn-vel').classList.contains('active'), false);
 });
