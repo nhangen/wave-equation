@@ -59,11 +59,9 @@
         @keyframes grid-move {
             0% {
                 transform: translate(0, 0);
-                -webkit-transform: translate(0, 0);
             }
             100% {
                 transform: translate(50px, 50px);
-                -webkit-transform: translate(50px, 50px);
             }
         }
 
@@ -79,8 +77,8 @@
                 radial-gradient(circle at 20% 50%, rgba(255, 0, 110, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 80% 80%, rgba(0, 245, 255, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 40% 20%, rgba(131, 56, 236, 0.1) 0%, transparent 50%);
-            filter: blur(40px);
             -webkit-filter: blur(40px);
+            filter: blur(40px);
             -webkit-animation: holo-shift 15s ease-in-out infinite;
             animation: holo-shift 15s ease-in-out infinite;
         }
@@ -93,11 +91,9 @@
         @keyframes holo-shift {
             0%, 100% {
                 transform: scale(1) rotate(0deg);
-                -webkit-transform: scale(1) rotate(0deg);
             }
             50% {
                 transform: scale(1.2) rotate(180deg);
-                -webkit-transform: scale(1.2) rotate(180deg);
             }
         }
 
@@ -128,8 +124,8 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            filter: drop-shadow(0 0 30px rgba(255, 0, 110, 0.8));
             -webkit-filter: drop-shadow(0 0 30px rgba(255, 0, 110, 0.8));
+            filter: drop-shadow(0 0 30px rgba(255, 0, 110, 0.8));
             -webkit-animation: glitch 2s infinite;
             animation: glitch 2s infinite;
         }
@@ -185,27 +181,22 @@
             0%, 100% {
                 clip-path: inset(0 0 0 0);
                 transform: translate(0);
-                -webkit-transform: translate(0);
             }
             20% {
                 clip-path: inset(60% 0 20% 0);
                 transform: translate(-2px, 2px);
-                -webkit-transform: translate(-2px, 2px);
             }
             40% {
                 clip-path: inset(20% 0 50% 0);
                 transform: translate(2px, -2px);
-                -webkit-transform: translate(2px, -2px);
             }
             60% {
                 clip-path: inset(80% 0 10% 0);
                 transform: translate(-2px, -2px);
-                -webkit-transform: translate(-2px, -2px);
             }
             80% {
                 clip-path: inset(5% 0 80% 0);
                 transform: translate(2px, 2px);
-                -webkit-transform: translate(2px, 2px);
             }
         }
 
@@ -421,10 +412,10 @@
             width: 0;
             height: 0;
             background: var(--neon-green);
-            transform: translate(-50%, -50%);
             -webkit-transform: translate(-50%, -50%);
-            transition: all 0.5s ease;
+            transform: translate(-50%, -50%);
             -webkit-transition: all 0.5s ease;
+            transition: all 0.5s ease;
             border-radius: 50%;
             z-index: 0;
         }
@@ -445,8 +436,8 @@
         .neon-button:active::before {
             width: 140%;
             height: 500%;
-            transition: all 0.2s ease;
             -webkit-transition: all 0.2s ease;
+            transition: all 0.2s ease;
         }
 
         .neon-button span {
@@ -588,11 +579,9 @@
         @keyframes cyber-spin {
             0% {
                 transform: rotate(0deg);
-                -webkit-transform: rotate(0deg);
             }
             100% {
                 transform: rotate(360deg);
-                -webkit-transform: rotate(360deg);
             }
         }
 
@@ -694,7 +683,7 @@
                     <span>INITIALIZE WAVE</span>
                 </button>
 
-                <button class="neon-button" onclick="startAnimation()" style="margin-top: 1rem;">
+                <button class="neon-button" onclick="toggleAnimation()" style="margin-top: 1rem;">
                     <span id="play-button-text">▶ PLAY</span>
                 </button>
             </div>
@@ -704,16 +693,14 @@
                 <h2 class="panel-title">Wave Dynamics</h2>
                 
                 <div class="mode-selector">
-                    <button class="mode-btn active" onclick="switchMode('displacement', this)">Displacement</button>
-                    <button class="mode-btn" onclick="switchMode('velocity', this)">Velocity</button>
-                    <button class="mode-btn" onclick="switchMode('energy', this)">Energy</button>
-                    <button class="mode-btn" onclick="switchMode('frequency', this)">Frequency</button>
+                    <button class="mode-btn active" data-mode="displacement" onclick="switchMode('displacement', this)">Displacement</button>
+                    <button class="mode-btn" data-mode="velocity" onclick="switchMode('velocity', this)">Velocity</button>
+                    <button class="mode-btn" data-mode="energy" onclick="switchMode('energy', this)">Energy</button>
+                    <button class="mode-btn" data-mode="frequency" onclick="switchMode('frequency', this)">Frequency</button>
                 </div>
                 
                 <div class="viz-container">
                     <div id="wave-plot"></div>
-                    <div id="frequency-plot" style="display: none;"></div>
-                    <div id="energy-plot" style="display: none;"></div>
                     <div class="cyber-loader" id="loader">
                         <div class="cyber-loader-inner"></div>
                     </div>
@@ -766,7 +753,9 @@
 
         // Update slider value display
         function updateSliderValue(slider) {
-            const valueSpan = document.getElementById(slider.id + '-value');
+            const spanId = slider.id === 'time-control' ? 'time-value' : slider.id + '-value';
+            const valueSpan = document.getElementById(spanId);
+            if (!valueSpan) return;
             if (slider.id === 'time-control') {
                 valueSpan.textContent = parseFloat(slider.value).toFixed(2) + ' s';
             } else {
@@ -991,7 +980,7 @@
             document.getElementById('fundamental-freq').textContent = fundamentalFreq.toFixed(1) + ' Hz';
             document.getElementById('wavelength').textContent = wavelength.toFixed(1) + ' m';
             document.getElementById('phase-velocity').textContent = c.toFixed(1) + ' m/s';
-            document.getElementById('energy-ratio').textContent = (kineticEnergy / totalEnergy).toFixed(2);
+            document.getElementById('energy-ratio').textContent = totalEnergy > 0 ? (kineticEnergy / totalEnergy).toFixed(2) : '0.00';
         }
 
         // Main solver function
@@ -1030,6 +1019,11 @@
             // Check if Plotly is loaded
             if (typeof Plotly === 'undefined') {
                 console.error('Plotly.js is not loaded');
+                pauseAnimation();
+                const plotDiv = document.getElementById('wave-plot');
+                if (plotDiv) {
+                    plotDiv.innerHTML = '<p style="color:#ff0055; text-align:center; padding:2rem;">Plotly.js failed to load. Please check your connection.</p>';
+                }
                 return;
             }
 
@@ -1060,14 +1054,16 @@
                             title: 'Position (m)',
                             color: '#00f5ff',
                             gridcolor: 'rgba(0, 245, 255, 0.1)',
-                            zerolinecolor: 'rgba(0, 245, 255, 0.3)'
+                            zerolinecolor: 'rgba(0, 245, 255, 0.3)',
+                            autorange: true
                         },
                         yaxis: {
                             title: 'Displacement (m)',
                             color: '#00f5ff',
                             gridcolor: 'rgba(0, 245, 255, 0.1)',
                             zerolinecolor: 'rgba(0, 245, 255, 0.3)',
-                            range: [-0.15, 0.15]
+                            range: [-0.15, 0.15],
+                            autorange: false
                         }
                     };
                     break;
@@ -1095,13 +1091,15 @@
                             title: 'Position (m)',
                             color: '#ff006e',
                             gridcolor: 'rgba(255, 0, 110, 0.1)',
-                            zerolinecolor: 'rgba(255, 0, 110, 0.3)'
+                            zerolinecolor: 'rgba(255, 0, 110, 0.3)',
+                            autorange: true
                         },
                         yaxis: {
                             title: 'Velocity (m/s)',
                             color: '#ff006e',
                             gridcolor: 'rgba(255, 0, 110, 0.1)',
-                            zerolinecolor: 'rgba(255, 0, 110, 0.3)'
+                            zerolinecolor: 'rgba(255, 0, 110, 0.3)',
+                            autorange: true
                         }
                     };
                     break;
@@ -1145,13 +1143,15 @@
                             title: 'Position (m)',
                             color: '#ffdd00',
                             gridcolor: 'rgba(255, 221, 0, 0.1)',
-                            zerolinecolor: 'rgba(255, 221, 0, 0.3)'
+                            zerolinecolor: 'rgba(255, 221, 0, 0.3)',
+                            autorange: true
                         },
                         yaxis: {
                             title: 'Energy Density',
                             color: '#ffdd00',
                             gridcolor: 'rgba(255, 221, 0, 0.1)',
-                            zerolinecolor: 'rgba(255, 221, 0, 0.3)'
+                            zerolinecolor: 'rgba(255, 221, 0, 0.3)',
+                            autorange: true
                         },
                         showlegend: true,
                         legend: {
@@ -1203,10 +1203,17 @@
                             title: 'Magnitude',
                             color: '#39ff14',
                             gridcolor: 'rgba(57, 255, 20, 0.1)',
-                            zerolinecolor: 'rgba(57, 255, 20, 0.3)'
+                            zerolinecolor: 'rgba(57, 255, 20, 0.3)',
+                            autorange: true
                         }
                     };
                     break;
+
+                default:
+                    console.warn(`Unrecognized mode "${currentMode}", falling back to displacement`);
+                    currentMode = 'displacement';
+                    visualizeWave();
+                    return;
             }
             
             // Common layout settings
@@ -1214,21 +1221,18 @@
             layout.plot_bgcolor = 'rgba(0, 0, 0, 0.2)';
             layout.font = { family: 'Orbitron', color: '#ffffff' };
             layout.margin = { t: 50, r: 30, b: 50, l: 60 };
+            layout.showlegend = currentMode === 'energy';
             
             const config = {
                 responsive: true,
                 displayModeBar: false
             };
 
-            // Use react instead of newPlot for better performance during animation
-            const plotDiv = document.getElementById('wave-plot');
-            if (plotDiv && plotDiv.data) {
-                // Plot already exists, use react for faster updates
-                Plotly.react('wave-plot', data, layout, config);
-            } else {
-                // Initial plot creation
-                Plotly.newPlot('wave-plot', data, layout, config);
-            }
+            // Use Plotly.react for atomic creation and updates without async branching races
+            Plotly.react('wave-plot', data, layout, config).catch(err => {
+                console.error('Plotly render error:', err);
+                pauseAnimation();
+            });
         }
 
         // Simple FFT implementation
@@ -1259,18 +1263,26 @@
         }
 
         // Animation control
-        function startAnimation() {
+        function toggleAnimation() {
             if (isPlaying) {
                 pauseAnimation();
             } else {
-                // Ensure any previous animation is stopped
-                if (animationId) {
-                    cancelAnimationFrame(animationId);
-                }
-                isPlaying = true;
-                document.getElementById('play-button-text').textContent = '❚❚ PAUSE';
-                animate();
+                startAnimation();
             }
+        }
+
+        function startAnimation() {
+            if (isPlaying) {
+                return;
+            }
+            // Ensure any previous animation frame is cancelled
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+            isPlaying = true;
+            document.getElementById('play-button-text').textContent = '❚❚ PAUSE';
+            animate();
         }
 
         function pauseAnimation() {
@@ -1340,13 +1352,13 @@
             const targetTime = parseFloat(slider.value);
             const dt = 0.01;
 
-            // Only recalculate if user dragged to a different time
-            if (Math.abs(targetTime - currentTime) > dt) {
+            // Recalculate wave state whenever target time changes
+            if (Math.abs(targetTime - currentTime) >= dt / 2) {
                 // Reset and evolve to target time
                 initializeWave();
                 currentTime = 0;
 
-                const steps = Math.floor(targetTime / dt);
+                const steps = Math.round(targetTime / dt);
                 for (let i = 0; i < steps; i++) {
                     evolveWave(dt);
                 }
@@ -1367,26 +1379,24 @@
 
         // Mode switching
         function switchMode(mode, clickedElement) {
+            const validModes = ['displacement', 'velocity', 'energy', 'frequency'];
+            if (!validModes.includes(mode)) {
+                console.warn(`Unrecognized mode "${mode}", ignoring switch request`);
+                return;
+            }
+
             currentMode = mode;
 
             // Update button styles
             document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
 
-            // If called from event handler, use the element reference
-            if (clickedElement) {
-                clickedElement.classList.add('active');
-            } else {
-                // Fallback: find and activate the correct button based on mode
-                const buttons = document.querySelectorAll('.mode-btn');
-                const modeMap = ['displacement', 'velocity', 'energy', 'frequency'];
-                const index = modeMap.indexOf(mode);
-                if (index >= 0 && buttons[index]) {
-                    buttons[index].classList.add('active');
-                }
+            const targetBtn = clickedElement || document.querySelector(`.mode-btn[data-mode="${mode}"]`);
+            if (targetBtn) {
+                targetBtn.classList.add('active');
             }
 
             // Update visualization
-            if (waveData.x.length > 0) {
+            if (waveData.x && waveData.x.length > 0) {
                 visualizeWave();
             }
         }
