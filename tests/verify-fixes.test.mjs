@@ -156,7 +156,14 @@ function setupTestEnvironment() {
         // the max-time reset, the catch that pauses -- could be deleted with
         // the suite still green.
         pumpFrame() {
-            const [id, cb] = [...rafCallbacks.entries()].pop() ?? [];
+            // Oldest first, and assert the queue never holds more than one.
+            // Taking the newest would hide exactly the bug this helper exists
+            // to expose: an orphaned frame that startAnimation's isPlaying
+            // guard failed to cancel would park at the head forever while the
+            // suite stayed green.
+            assert.ok(rafCallbacks.size <= 1,
+                `animate queued ${rafCallbacks.size} frames; at most one should be outstanding`);
+            const [id, cb] = [...rafCallbacks.entries()].shift() ?? [];
             if (cb === undefined) return false;
             rafCallbacks.delete(id);
             cb();
@@ -329,7 +336,11 @@ test('animate resets the loop when currentTime passes the slider max', () => {
 
     assert.ok(getState().currentTime < 1,
         `currentTime should wrap to ~0 past the max, got ${getState().currentTime}`);
-    assert.equal(getState().waveData.x.length > 0, true, 'the wave should be re-initialized on wrap');
+    // Not `waveData.x.length > 0` -- initializeWave() above already satisfies
+    // that, so it would pass with the reset deleted. The slider is what the
+    // reset writes through, so read it back instead.
+    assert.ok(parseFloat(elements.get('time-control').value) < 1,
+        'the slider should follow currentTime back to the start of the loop');
 });
 
 test('animate pauses playback when the loop body throws', () => {
